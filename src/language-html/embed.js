@@ -33,6 +33,13 @@ const embeddedAngularControlFlowBlocks = new Set([
   "case",
 ]);
 
+function isInsideAngularNonBindable(path) {
+  return path.ancestors.some(
+    (node) =>
+      node.kind === "element" && Object.hasOwn(node.attrMap, "ngNonBindable"),
+  );
+}
+
 function embed(path, options) {
   const { node } = path;
 
@@ -110,6 +117,10 @@ function embed(path, options) {
           };
         }
       } else if (node.parent.kind === "interpolation") {
+        if (options.parser === "angular" && isInsideAngularNonBindable(path)) {
+          return;
+        }
+
         return async (textToDoc) => {
           const textToDocOptions = {
             __isInHtmlInterpolation: true, // to avoid unexpected `}}`
