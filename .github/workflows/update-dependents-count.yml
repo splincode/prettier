@@ -1,10 +1,10 @@
-name: Cleanup cspell.json
+name: Update dependents count
 
 on:
   workflow_dispatch:
   schedule:
-    # “At 00:00 on day-of-month 1 in July.” https://crontab.guru/#0_0_1_7_*
-    - cron: "0 0 1 7 *"
+    # “At 00:00 on day-of-month 1.” https://crontab.guru/#0_0_1_*_*
+    - cron: "0 0 1 * *"
 
 permissions:
   pull-requests: write
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   run:
-    name: Cleanup cspell.json
+    name: Update dependents count
     if: github.event_name != 'schedule' || github.repository == 'prettier/prettier'
     runs-on: ubuntu-latest
     steps:
@@ -28,14 +28,17 @@ jobs:
         run: yarn --immutable
 
       - name: Run script
-        run: node scripts/clean-cspell.js
+        run: node scripts/update-dependents-count.js
+
+      - name: Format website
+        run: yarn prettier website/src/pages/index.jsx --write
 
       - name: Set current date env
         run: echo "CURRENT_DATE=$(date +'%Y-%m-%d')" >> "$GITHUB_ENV"
 
       - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
-          commit-message: Cleanup cspell.json (${{ env.CURRENT_DATE }})
-          branch: automated-cleanup-cspell-${{ env.CURRENT_DATE }}
+          commit-message: Update dependents count (${{ env.CURRENT_DATE }})
+          branch: automated-update-dependents-count-${{ env.CURRENT_DATE }}
           branch-suffix: timestamp
-          title: Cleanup cspell.json (${{ env.CURRENT_DATE }})
+          title: Update dependents count (${{ env.CURRENT_DATE }})
