@@ -333,20 +333,21 @@ function extractInterpolation(ast, options) {
 }
 
 function splitAngularInterpolation(child, options) {
-  if (options.parser !== "angular") {
+  if (options.parser !== "angular" || !child.tokens) {
     return;
   }
 
-  const interpolationTokens = child.tokens?.filter(
-    ({ parts }) =>
-      parts.length === 3 &&
-      parts[0] === "{{" &&
-      parts[1].length > 0 &&
-      parts[2] === "}}",
-  );
+  const isInterpolationToken = ({ parts }) =>
+    parts.length === 3 &&
+    parts[0] === "{{" &&
+    parts[1].length > 0 &&
+    parts[2] === "}}";
 
   if (
-    !interpolationTokens?.some(({ parts: [, value] }) => value.includes("}}"))
+    !child.tokens.some(
+      (token) =>
+        isInterpolationToken(token) && token.parts[1].includes("}}"),
+    )
   ) {
     return;
   }
@@ -354,11 +355,18 @@ function splitAngularInterpolation(child, options) {
   const components = [];
   let startSourceSpan = child.sourceSpan.start;
 
-  for (const { sourceSpan } of interpolationTokens) {
+  for (const token of child.tokens) {
+    if (!isInterpolationToken(token)) {
+      continue;
+    }
+
+    const { sourceSpan } = token;
+
     components.push(
       new ParseSourceSpan(startSourceSpan, sourceSpan.start).toString(),
       sourceSpan.toString().slice(2, -2),
     );
+
     startSourceSpan = sourceSpan.end;
   }
 
