@@ -343,12 +343,12 @@ function splitAngularInterpolation(child, options) {
     parts[1].length > 0 &&
     parts[2] === "}}";
 
-  if (
-    child.tokens.every(
-      (token) =>
-        !(isInterpolationToken(token) && token.parts[1].includes("}}")),
-    )
-  ) {
+  const hasProblematicInterpolation = child.tokens.some(
+    (token) =>
+      isInterpolationToken(token) && token.parts[1].includes("}}"),
+  );
+
+  if (!hasProblematicInterpolation) {
     return;
   }
 
