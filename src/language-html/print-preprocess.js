@@ -344,8 +344,7 @@ function splitAngularInterpolation(child, options) {
     parts[2] === "}}";
 
   const hasProblematicInterpolation = child.tokens.some(
-    (token) =>
-      isInterpolationToken(token) && token.parts[1].includes("}}"),
+    (token) => isInterpolationToken(token) && token.parts[1].includes("}}"),
   );
 
   if (!hasProblematicInterpolation) {
