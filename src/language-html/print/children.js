@@ -99,7 +99,7 @@ function printBetweenLine(prevNode, nextNode) {
     prevNode.firstChild.kind === "interpolation" &&
     (prevNode.hasLeadingSpaces || nextNode.kind === "text")
   ) {
-    return "";
+    return nextNode.kind === "text" ? softline : "";
   }
 
   if (
