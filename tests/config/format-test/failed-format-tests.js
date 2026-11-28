@@ -13,7 +13,6 @@ const unstableTests = new Map(
     "flow/comments/type_annotations.js",
     "typescript/prettier-ignore/mapped-types.ts",
     "typescript/prettier-ignore/issue-14238.ts",
-    "js/for-of-statement/comments.js",
     "jsx/comments/in-attributes.js",
     "typescript/import-type/long-module-name/long-module-name4.ts",
     [
@@ -31,7 +30,14 @@ const unstableTests = new Map(
   }),
 );
 
-const unstableAstTests = new Map();
+const unstableAstTests = new Map(
+  ["less/case/variable.less"].map((fixture) => {
+    const [file, isUnstable = () => true] = Array.isArray(fixture)
+      ? fixture
+      : [fixture];
+    return [path.join(FORMAT_TEST_DIRECTORY, file), isUnstable];
+  }),
+);
 
 // These tests works on `babel`, `acorn`, `espree`, `oxc`, and `meriyah`
 const commentClosureTypecaseTests = [
@@ -49,10 +55,6 @@ const disabledTests = new Map(
     "oxc-ts": [],
     yuku: ["js/await-expression/await-with-parens.js"],
     "yuku-ts": ["js/await-expression/await-with-parens.js"],
-    hermes: [
-      "js/await-expression/like-call.js", // Different result
-      "jsx/top-level-await/test.jsx",
-    ],
     flow: [
       "js/await-expression/await-with-parens.js",
       "js/await-expression/like-call.js",
